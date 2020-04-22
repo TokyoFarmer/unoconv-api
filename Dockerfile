@@ -4,31 +4,32 @@ COPY . /unoconv-api
 RUN go build
 
 
-FROM ubuntu:xenial
+FROM ubuntu:20.04
 
 LABEL maintainer="kaufmann.r@gmail.com"
 
 COPY --from=api-builder /unoconv-api/unoconv-api /opt/unoconv-api/unoconv-api
 
-#Install unoconv
+#Install unoconv and other deps
+ENV DEBIAN_FRONTEND=noninteractive
 RUN \
 	apt-get update && \
-	DEBIAN_FRONTEND=noninteractive \
-	    apt-get upgrade -y && \
-		apt-get install -y \
-		        locales \
+	echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
+	echo "tzdata tzdata/Areas select Europe" | debconf-set-selections && \
+	echo "tzdata tzdata/Zones/Europe select Berlin" | debconf-set-selections && \
+	apt-get install -y --no-install-recommends \
+			locales \
 			unoconv \
+			ttf-mscorefonts-installer \
 			supervisor && \
-        apt-get remove -y && \
-	    apt-get autoremove -y && \
-        apt-get clean && \
-			rm -rf /var/lib/apt/lists/
+	apt-get remove -y && \
+	apt-get autoremove -y && \
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/
 
 # Set the locale
-RUN locale-gen de_DE.UTF-8  
-ENV LANG de_DE.UTF-8  
-ENV LANGUAGE de_DE:de  
-ENV LC_ALL de_DE.UTF-8  
+RUN locale-gen en_GB.UTF-8
+ENV LANG en_GB.UTF-8
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
