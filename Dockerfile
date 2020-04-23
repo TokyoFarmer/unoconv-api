@@ -17,11 +17,11 @@ RUN \
 	echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
 	echo "tzdata tzdata/Areas select Europe" | debconf-set-selections && \
 	echo "tzdata tzdata/Zones/Europe select Berlin" | debconf-set-selections && \
-	apt-get install -y --no-install-recommends \
-			locales \
-			unoconv \
-			ttf-mscorefonts-installer \
-			supervisor && \
+	apt-get install -y \
+	locales \
+	unoconv \
+	ttf-mscorefonts-installer \
+	supervisor && \
 	apt-get remove -y && \
 	apt-get autoremove -y && \
 	apt-get clean && \
@@ -37,7 +37,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=10s \
-    CMD curl http://localhost:3000/unoconv/health
+	CMD curl http://localhost:3000/unoconv/health
 
 # Startup
 ENTRYPOINT ["/usr/bin/supervisord"]
